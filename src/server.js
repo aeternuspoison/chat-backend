@@ -1,40 +1,51 @@
-const { WebSocketServer } = require('ws');
-const dotenv = require('dotenv');
+const http = require("http");
+const { WebSocketServer } = require("ws");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 const PORT = process.env.PORT || 8080;
 
-const server = new WebSocketServer({
-    port: PORT
+const server = http.createServer((req, res) => {
+    if (req.url === "/") {
+        res.writeHead(200, {
+            "Content-Type": "text/plain"
+        });
+
+        res.end("WebSocket server funcionando!");
+        return;
+    }
+
+    res.writeHead(404);
+    res.end("Not Found");
 });
 
-server.on('connection', (ws) => {
+const wss = new WebSocketServer({
+    server
+});
 
-    console.log('Client connected');
+wss.on("connection", (ws) => {
+    console.log("Client connected");
 
-    ws.on('error', (error) => {
-        console.error('WebSocket error:', error);
+    ws.on("error", (error) => {
+        console.error("WebSocket error:", error);
     });
 
-    ws.on('message', (message) => {
+    ws.on("message", (message) => {
+        console.log("Message:", message.toString());
 
-        console.log('Message:', message.toString());
-
-        server.clients.forEach((client) => {
-
+        wss.clients.forEach((client) => {
             if (client.readyState === 1) {
                 client.send(message.toString());
             }
-
         });
-
     });
 
-    ws.on('close', () => {
-        console.log('Client disconnected');
+    ws.on("close", () => {
+        console.log("Client disconnected");
     });
-
 });
 
-console.log(`WebSocket server running on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
