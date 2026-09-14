@@ -6,8 +6,13 @@ dotenv.config();
 
 const PORT = process.env.PORT || 8080;
 
+console.log("=================================");
+console.log("INICIANDO BACKEND");
+console.log("PORT:", PORT);
+console.log("=================================");
+
 const httpServer = http.createServer((req, res) => {
-    console.log(`HTTP request: ${req.method} ${req.url}`);
+    console.log(`HTTP: ${req.method} ${req.url}`);
 
     if (req.url === "/") {
         res.writeHead(200, {
@@ -30,7 +35,9 @@ const server = new WebSocketServer({
 });
 
 server.on("connection", (ws) => {
-    console.log("Client connected");
+    console.log("=================================");
+    console.log("CLIENTE CONECTADO");
+    console.log("=================================");
 
     ws.on("error", (error) => {
         console.error("WebSocket error:", error);
@@ -54,6 +61,7 @@ server.on("connection", (ws) => {
 });
 
 httpServer.listen(PORT, () => {
+    console.log("=================================");
     console.log(`HTTP/WebSocket server running on port ${PORT}`);
-    console.log(`Port: ${PORT}`);
+    console.log("=================================");
 });
